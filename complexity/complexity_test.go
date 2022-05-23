@@ -1,24 +1,46 @@
 package complexity
 
-import "testing"
+import (
+	"go/ast"
+	"go/parser"
+	"go/token"
+	"testing"
+)
+
+func GetFuncNode(t *testing.T, code string) ast.Node {
+	t.Helper()
+
+	fset := token.NewFileSet()
+	file, err := parser.ParseFile(fset, "", code, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, decl := range file.Decls {
+		if fd, ok := decl.(*ast.FuncDecl); ok {
+			return fd
+		}
+	}
+	t.Fatal("no function declear found")
+	return nil
+}
 
 func TestComplexity(t *testing.T) {
-  testcases := []struct{
-    name string
-    code string
-    complexity int
-  }{
-    //TODO
-  }
+	testcases := []struct {
+		name       string
+		code       string
+		complexity int
+	}{
+		//TODO
+	}
 
-  for _, testcase := range testcases {
-    t.Run(testcase.name, func(t *testing.T) {
-      a := GetAST(t, testcase.code)
-      c := Count(a)
+	for _, testcase := range testcases {
+		t.Run(testcase.name, func(t *testing.T) {
+			a := GetFuncNode(t, testcase.code)
+			c := Count(a)
 
-      if c != testcase.complexity {
-        t.Errorf("got=%d, want=%d", c, testcase.complexity)
-      }
-    })
-  }
+			if c != testcase.complexity {
+				t.Errorf("got=%d, want=%d", c, testcase.complexity)
+			}
+		})
+	}
 }
